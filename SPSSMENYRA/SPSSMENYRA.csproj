@@ -1,0 +1,125 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project Sdk="Microsoft.NET.Sdk.WindowsDesktop">
+
+  <!-- Rozpis sluzeb (smeny) - jedno EXE pro R.A. (VFP SPORTA, tabulky dr0/dr1/tr2/tr3) a ATK (VFP SPORT0, tabulky da0/da1/ta2/ta3), varianta viz Smena -->
+
+  <PropertyGroup>
+
+    <OutputType>WinExe</OutputType>
+    <TargetFramework>net48</TargetFramework>
+    <UseWPF>true</UseWPF>
+    <UseWindowsForms>true</UseWindowsForms>
+
+    <RootNamespace>SPSSMENYRA</RootNamespace>
+    <AssemblyName>SPSSMENYRA</AssemblyName>
+    <StartupObject>SPSSMENYRA.StartClass</StartupObject>
+    <ApplicationIcon>sportis.ico</ApplicationIcon>
+
+	<Version>$([System.IO.File]::ReadAllText('$(MSBuildProjectDirectory)\..\version.txt').Trim())</Version>
+    <AssemblyVersion>$([System.IO.File]::ReadAllText('$(MSBuildProjectDirectory)\..\version.txt').Trim()).0</AssemblyVersion>
+    <FileVersion>$([System.IO.File]::ReadAllText('$(MSBuildProjectDirectory)\..\version.txt').Trim()).0</FileVersion>
+	<InformationalVersion>$([System.IO.File]::ReadAllText('$(MSBuildProjectDirectory)\..\version.txt').Trim())</InformationalVersion>
+
+	<LangVersion>latest</LangVersion>
+    <Platforms>AnyCPU</Platforms>
+    <WarningLevel>4</WarningLevel>
+    <Deterministic>true</Deterministic>
+
+    <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
+    <GenerateBindingRedirectsOutputType>true</GenerateBindingRedirectsOutputType>
+
+    <!-- kvůli dotnet build -->
+    <GenerateManifests>false</GenerateManifests>
+    <SignManifests>false</SignManifests>
+
+	<!-- Visual FoxPro / COM / OLEDB -->
+    <PlatformTarget>x86</PlatformTarget>
+    <Prefer32Bit>true</Prefer32Bit>
+ </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
+    <PlatformTarget>x86</PlatformTarget>
+    <Prefer32Bit>true</Prefer32Bit>
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
+    <PlatformTarget>x86</PlatformTarget>
+    <Prefer32Bit>true</Prefer32Bit>
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+
+  <!-- framework references -->
+
+  <ItemGroup>
+    <Reference Include="Microsoft.CSharp" />
+    <Reference Include="System.Configuration" />
+    <Reference Include="System.Data.Linq" />
+    <Reference Include="System.Data.DataSetExtensions" />
+    <Reference Include="System.Deployment" />
+    <Reference Include="System.Drawing" />
+    <Reference Include="System.Windows.Forms" />
+
+    <Reference Include="MySql.Data">
+      <HintPath>..\..\JisResources\MySql\MySql.Data.dll</HintPath>
+      <Private>true</Private>
+    </Reference>
+
+  </ItemGroup>
+
+  <!-- project refs -->
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\JisResources\JisResources.csproj" />
+    <ProjectReference Include="..\..\SpsSpolecne\SpsSpolecne.csproj" />
+  </ItemGroup>
+
+  <!-- RDLC -->
+
+  <ItemGroup>
+    <Content Include="Reports\**\*.rdlc">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+  </ItemGroup>
+
+  <!-- splash / icons -->
+
+  <ItemGroup>
+    <Resource Include="sportis.ico" />
+    <Resource Include="sportis.gif" />
+  </ItemGroup>
+
+  <!-- SDK-style cleanup -->
+
+  <ItemGroup>
+    <Compile Remove="obj\**" />
+    <EmbeddedResource Remove="obj\**" />
+    <None Remove="obj\**" />
+    <Page Remove="obj\**" />
+  </ItemGroup>
+
+  <Target Name="AfterBuild">
+
+    <ItemGroup>
+
+      <FilesToDelete Include="$(TargetDir)\*.pdb" Exclude="$(TargetDir)\$(TargetName).pdb" />
+      <FilesToDelete Include="$(TargetDir)\*.xml" />
+      <FilesToDelete Include="$(TargetDir)\*.config" Exclude="$(TargetDir)\$(TargetName).config" />
+    </ItemGroup>
+
+    <Delete Files="@(FilesToDelete)" />
+
+  </Target>
+
+</Project>

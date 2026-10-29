@@ -1,0 +1,12 @@
+{
+  "profiles": {
+    "SPSSMENYRA R.A.": {
+      "commandName": "Project",
+      "commandLineArgs": "RA"
+    },
+    "SPSSMENYRA ATK": {
+      "commandName": "Project",
+      "commandLineArgs": "ATK"
+    }
+  }
+}
