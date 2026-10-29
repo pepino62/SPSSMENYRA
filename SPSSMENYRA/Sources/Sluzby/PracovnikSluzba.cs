@@ -91,6 +91,16 @@ namespace SPSSMENYRA
         }
 
         /// <summary>
+        /// telefon z masky "___ ___ ___" - jen cislice po trojicich ("605 577 737"), bez cislic prazdny (jako SpsLite RezervaceSluzba.Telefon)
+        /// </summary>
+        public static string Telefon(string cislo)
+        {
+            string cislice = new string( (cislo ?? "").Where( char.IsDigit ).ToArray() );
+            return string.Join( " ", Enumerable.Range( 0, (cislice.Length + 2) / 3 )
+                .Select( i => cislice.Substring( i * 3, Math.Min( 3, cislice.Length - i * 3 ) ) ) );
+        }
+
+        /// <summary>
         /// ulozi pracovnika a planovanou dovolenu na rok (VFP SPORT1_SAVE) - novy dostane klic az pri ulozeni
         /// <br>VFP plan 0 neukladal (zustala puvodni hodnota) - zde se ulozi i 0, novy zaznam planu jen pro nenulovy</br>
         /// </summary>
@@ -98,7 +108,7 @@ namespace SPSSMENYRA
         {
             p.Ft302 = (p.Ft302 ?? "").Trim();
             p.Ft303 = (p.Ft303 ?? "").Trim();
-            p.Ft306 = (p.Ft306 ?? "").Trim();
+            p.Ft306 = Telefon( p.Ft306 );
             if (string.IsNullOrEmpty( p.Ft303 ))
                 p.Ft303 = p.Ft302;                  // VFP SPORT1_FT302VALID
 
