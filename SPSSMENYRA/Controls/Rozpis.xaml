@@ -11,9 +11,11 @@
             <RowDefinition Height="Auto"/>
             <RowDefinition Height="*"/>
         </Grid.RowDefinitions>
+        <!-- oba sloupce podle obsahu - sirka gridu nezavisi na sirce okna (pri zuzeni okna se pravy grid jen orizne);
+             s "*" se pri zuzeni pravy grid smackl a prepinani posuvniku zacyklilo layout (zamrznuti pri roztahovani okna) -->
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="Auto"/>
-            <ColumnDefinition Width="*"/>
+            <ColumnDefinition Width="Auto"/>
         </Grid.ColumnDefinitions>
 
         <!-- vyber roku a mesice (VFP SPORT0_CNT004) -->
@@ -54,11 +56,13 @@
 
         <!-- rozpis (VFP SPORT0_GRD001) - dvojklik: vyber casu / pracovnika / hodin, prave tlacitko: radky -->
         <jr:JisDataGrid x:Name="USERDATAGRID1" Grid.Row="1" Grid.Column="0" HorizontalAlignment="Left"
+                        ScrollViewer.VerticalScrollBarVisibility="Visible"
                         jisWgridSkey="SMENY_ROZPIS"
                         jisSourceName="rozpis"/>
 
         <!-- soucty pracovniku (VFP SPORT0_GRD002) -->
         <jr:JisDataGrid x:Name="USERDATAGRID2" Grid.Row="1" Grid.Column="1" Margin="10,0,0,0" HorizontalAlignment="Left"
+                        ScrollViewer.VerticalScrollBarVisibility="Visible"
                         jisWgridSkey="SMENY_PRACOVNICI"
                         jisSourceName="pracovnici"/>
 
