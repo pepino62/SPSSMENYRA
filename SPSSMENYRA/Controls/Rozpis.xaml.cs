@@ -159,6 +159,15 @@ namespace SPSSMENYRA
             /// </summary>
             public string NabidnutyMesic { get; set; } = "";
 
+            /// <summary>
+            /// pracovnici oznaceni v pravem gridu (ft301) - rozpis ukazuje jen je (VFP SPORT0_XOS_MARK, tmq.ft301)
+            /// </summary>
+            HashSet<string> oznaceni = new HashSet<string>();
+            bool filtrCeka;
+
+            string _FiltrText = "";
+            public string FiltrText { get => _FiltrText; set => SetField( ref _FiltrText, value ); }
+
             public RozpisBind() : base()
             {
                 AddMethod( () => { SaveParameters(); }, "CallCloseMethod" );
@@ -216,7 +225,8 @@ namespace SPSSMENYRA
                         d0.f00{n}1 AS fk{n},
                         IF(d0.f003 = '1', IFNULL(t2_{n}.ft202, ''), IFNULL(t3_{n}.ft302, '')) AS fx{n},
                         IF(d0.f00{n}1 = '', NULL, IF(d0.f003 = '2' AND d0.f00{n}3 <> 0, d0.f00{n}3, NULLIF(d0.f00{n}2, 0))) AS fh{n},
-                        IF(d0.f003 = '2' AND d0.f00{n}1 <> '' AND d0.f00{n}3 <> 0, 1, 0) AS fr{n}";
+                        IF(d0.f003 = '2' AND d0.f00{n}1 <> '' AND d0.f00{n}3 <> 0, 1, 0) AS fr{n},
+                        IF(d0.f00{n}1 = '', NULL, IF(d0.f003 = '2' AND d0.f00{n}3 <> 0, d0.f00{n}3, NULLIF(d0.f00{n}2, 0))) AS fs{n}";
                     join += $@"
                         LEFT JOIN {Smena.T2} t2_{n} ON t2_{n}.ft201 = d0.f00{n}1 AND d0.f003 = '1'
                         LEFT JOIN {Smena.T3} t3_{n} ON t3_{n}.ft301 = d0.f00{n}1 AND d0.f003 = '2'";
@@ -231,7 +241,60 @@ namespace SPSSMENYRA
                     WHERE d0.f004 = 'R' AND d0.f002 BETWEEN @datod AND @datdo
                     ORDER BY d0.f002, d0.f003, d0.f005";
 
-                return SpravaDat.Select( "rozpis", cmd, new { datod = od, datdo = od.AddMonths( 1 ).AddDays( -1 ) } );
+                if (!SpravaDat.Select( "rozpis", cmd, new { datod = od, datdo = od.AddMonths( 1 ).AddDays( -1 ) } ))
+                    return false;
+                Filtrovat();
+                return true;
+            }
+
+            /// <summary>
+            /// filtr podle oznacenych pracovniku - u ostatnich se v radcich dne skryje jmeno a hodiny (VFP SPORT0_2TMP_C s tmq.ft301)
+            /// <br>FK (kod) a FS (hodiny pro soucet dne) zustavaji - editace i soucty pracuji se skutecnymi daty</br>
+            /// </summary>
+            void Filtrovat()
+            {
+                if (oznaceni.Count == 0)
+                    return;
+                DataTable dt = Goa.Table( "rozpis" );
+                foreach (DataColumn c in dt.Columns)
+                    c.ReadOnly = false;
+                foreach (DataRow r in dt.Rows)
+                {
+                    if ($"{r[ "f003" ]}" != RozpisSluzba.RadekDne)
+                        continue;
+                    for (int n = 1; n <= RozpisSluzba.Sloupcu; n++)
+                    {
+                        string kod = $"{r[ $"fk{n}" ]}".Trim();
+                        if (kod != "" && !oznaceni.Contains( kod ))
+                        {
+                            r[ $"fx{n}" ] = "";
+                            r[ $"fh{n}" ] = DBNull.Value;
+                            r[ $"fr{n}" ] = 0;
+                        }
+                    }
+                }
+                dt.AcceptChanges();
+            }
+
+            /// <summary>
+            /// zmena oznaceni v pravem gridu - po dokonceni kliknuti (i hromadneho oznac vse / odznac vse) jednou obnovi rozpis
+            /// </summary>
+            void Pracovnici_ColumnChanged(object sender, DataColumnChangeEventArgs e)
+            {
+                if (!string.Equals( e.Column.ColumnName, "fmark", StringComparison.OrdinalIgnoreCase ) || filtrCeka)
+                    return;
+                filtrCeka = true;
+                Stranka.Dispatcher.BeginInvoke( new Action( () =>
+                {
+                    filtrCeka = false;
+                    DataTable prac = Goa.Table( "pracovnici" );
+                    oznaceni = new HashSet<string>( prac.AsEnumerable()
+                        .Where( r => $"{r[ "ftyp" ]}" == "1" && Convert.ToInt32( r[ "fmark" ] ) != 0 )
+                        .Select( r => $"{r[ "ft301" ]}".Trim() ) );
+                    FiltrText = oznaceni.Count == 0 ? "" : "rozpis jen pro : " + string.Join( ", ", prac.AsEnumerable()
+                        .Where( r => oznaceni.Contains( $"{r[ "ft301" ]}".Trim() ) ).Select( r => $"{r[ "ft302" ]}".Trim() ) );
+                    Stranka.Refresh();
+                } ), System.Windows.Threading.DispatcherPriority.Background );
             }
 
             /// <summary>
@@ -242,7 +305,7 @@ namespace SPSSMENYRA
             {
                 DateTime od = new DateTime( Rok, Mesic, 1 );
                 string cmd = $@"
-                    SELECT t3.ft301, t3.ft302, t3.ft304, '1' AS ftyp,
+                    SELECT FALSE AS fmark, t3.ft301, t3.ft302, t3.ft304, '1' AS ftyp,
                         CAST(0 AS DECIMAL(6,1)) AS fhodx,
                         CAST(IFNULL(m.hod, 0) AS DECIMAL(7,1)) AS fhodm,
                         CAST(IFNULL(m.smen, 0) AS DECIMAL(4,0)) AS fsmen,
@@ -263,8 +326,18 @@ namespace SPSSMENYRA
                     return false;
 
                 DataTable dt = Goa.Table( "pracovnici" );
+                dt.ColumnChanged -= Pracovnici_ColumnChanged;
                 foreach (DataColumn c in dt.Columns)
                     c.ReadOnly = false;
+
+                // oznaceni zustava i po obnoveni / zmene mesice - jen u pracovniku, kteri jsou v seznamu
+                oznaceni.IntersectWith( dt.AsEnumerable().Select( r => $"{r[ "ft301" ]}".Trim() ) );
+                foreach (DataRow r in dt.Rows)
+                    if (oznaceni.Contains( $"{r[ "ft301" ]}".Trim() ))
+                        r[ "fmark" ] = 1;
+                if (oznaceni.Count == 0)
+                    FiltrText = "";
+
                 DataRow celkem = dt.NewRow();
                 celkem[ "ft301" ] = "";
                 celkem[ "ft302" ] = "Celkem";
@@ -272,7 +345,10 @@ namespace SPSSMENYRA
                 celkem[ "ftyp" ] = "2";
                 foreach (string f in new[] { "fhodx", "fhodm", "fsmen", "fhodc" })
                     celkem[ f ] = dt.AsEnumerable().Sum( r => Convert.ToDecimal( r[ f ] ) );
+                celkem[ "fmark" ] = 0;
                 dt.Rows.Add( celkem );
+                dt.AcceptChanges();
+                dt.ColumnChanged += Pracovnici_ColumnChanged;
                 return true;
             }
 
@@ -286,7 +362,7 @@ namespace SPSSMENYRA
                     WHERE d0.f003 = '2' AND d0.f004 = 'R' AND d0.f00{n}1 <> '' AND d0.f002 BETWEEN {od} AND {@do}" ) );
 
             /// <summary>
-            /// hodiny pracovniku za den vybrany v rozpisu (VFP SPORT0_2TMT3_SUM_DAY) - casovy radek = bez hodin
+            /// hodiny pracovniku za den vybrany v rozpisu (VFP SPORT0_2TMT3_SUM_DAY) - casovy radek = bez hodin, filtr se neuplatni
             /// </summary>
             public void SoucetDne()
             {
@@ -304,8 +380,8 @@ namespace SPSSMENYRA
                         for (int n = 1; n <= RozpisSluzba.Sloupcu; n++)
                         {
                             string kod = $"{r[ $"fk{n}" ]}".Trim();
-                            if (kod != "" && r[ $"fh{n}" ] != DBNull.Value)
-                                hodiny[ kod ] = (hodiny.TryGetValue( kod, out decimal h ) ? h : 0) + Convert.ToDecimal( r[ $"fh{n}" ] );
+                            if (kod != "" && r[ $"fs{n}" ] != DBNull.Value)    // fs - i pracovnici skryti filtrem
+                                hodiny[ kod ] = (hodiny.TryGetValue( kod, out decimal h ) ? h : 0) + Convert.ToDecimal( r[ $"fs{n}" ] );
                         }
 
                 foreach (DataRow p in prac.Rows)
