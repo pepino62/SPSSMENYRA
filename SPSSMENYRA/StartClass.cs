@@ -106,6 +106,7 @@ namespace SPSSMENYRA
             }
 
             AddPage( new Rozpis(), "  ROZPIS  " );
+            AddPage( new Sumarizace(), "  SUMARIZACE  " );
         }
     }
 
@@ -165,6 +166,24 @@ namespace SPSSMENYRA
                     if ((string)dataRow[ "FTYP" ] == "2")
                         return "#00F080";
                     return "#CCE4FF";
+
+                // sumarizace - radek Celkem zeleny, jinak podle sloupce: jmeno zlute, dovolena seda, ROK fialovy, ostatni bile (VFP SPORT0_GRD003)
+                case "CB_SMENY_SUM":
+                    if ((string)dataRow[ "FTYP" ] == "2")
+                        return "#00F080";
+                    switch (fieldName.ToUpper())
+                    {
+                        case "FT302": return "#F2F7BE";
+                        case "FDOVP":
+                        case "FDOVV": return "#E6E6E6";
+                        case "FROK": return "#E6DCF5";
+                        default: return Brushes.White;
+                    }
+
+                case "CF_SMENY_SUM":
+                    if ((string)dataRow[ "F0" ] == "1")
+                        return "#909090";
+                    break;
 
                 default:
                     return null;

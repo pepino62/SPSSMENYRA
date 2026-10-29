@@ -55,6 +55,16 @@ namespace SPSSMENYRA
             }
         }
 
+        /// <summary>
+        /// SQL hodin a smen pracovniku ze vsech 4 sloupcu radku dne v obdobi (rucne opravene maji prednost)
+        /// <br>sloupce ft301, f002, hod, smen (1 za kazdy obsazeny sloupec); od / do = nazvy parametru, napr. "@datod"</br>
+        /// </summary>
+        public static string HodinySql(string od, string @do)
+            => string.Join( " UNION ALL ", Enumerable.Range( 1, Sloupcu ).Select( n => $@"
+                SELECT d0.f00{n}1 AS ft301, d0.f002, IF(d0.f00{n}3 <> 0, d0.f00{n}3, d0.f00{n}2) AS hod, 1 AS smen
+                FROM {Smena.D0} d0
+                WHERE d0.f003 = '2' AND d0.f004 = 'R' AND d0.f00{n}1 <> '' AND d0.f002 BETWEEN {od} AND {@do}" ) );
+
         #region <<< zmeny v bunce (sloupec n = 1..4) >>>
 
         /// <summary>

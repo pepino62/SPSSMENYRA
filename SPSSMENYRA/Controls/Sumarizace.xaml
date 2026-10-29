@@ -1,0 +1,38 @@
+<jr:JisUserControl x:Class="SPSSMENYRA.Sumarizace"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:local="clr-namespace:SPSSMENYRA"
+             mc:Ignorable="d"
+             xmlns:jr="clr-namespace:JisResources;assembly=JisResources">
+    <Grid Margin="10">
+        <Grid.RowDefinitions >
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
+
+        <!-- vyber roku (VFP SPORT0_CNT003) -->
+        <Border Grid.Row="0" Margin="0,0,0,10" CornerRadius="2" BorderBrush="#979AAA" BorderThickness="1" Background="#94D880" HorizontalAlignment="Left" >
+            <StackPanel Orientation="Horizontal" Margin="5" >
+                <Label Content="Na rok :" Style="{DynamicResource LBL_CENTER}" />
+                <ComboBox x:Name="cboRok"
+                          MinWidth="70"
+                          Margin="2,0,15,0"
+                          ItemsSource="{Binding Roky}"
+                          SelectedValue="{Binding Rok}"
+                          SelectionChanged="CboRok_SelectionChanged"
+                          Style="{DynamicResource JisComboBox}" />
+
+                <jr:JisButton Content=" OBNOVIT " Style="{StaticResource BUTT_DARK}" Background="SteelBlue" Click="BtnObnovit_Click"
+                              ToolTip="znovu načte sumarizaci vybraného roku" VerticalAlignment="Center" Margin="10,0,0,0" />
+            </StackPanel>
+        </Border>
+
+        <!-- hodiny pracovniku po mesicich a za rok, dovolena (VFP SPORT0_GRD003) -->
+        <jr:JisDataGrid x:Name="USERDATAGRID1" Grid.Row="1" HorizontalAlignment="Left"
+                        jisWgridSkey="SMENY_SUMARIZACE"
+                        jisSourceName="sumarizace"/>
+
+    </Grid>
+</jr:JisUserControl>

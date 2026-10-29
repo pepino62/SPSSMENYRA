@@ -35,9 +35,14 @@ namespace SPSSMENYRA
             USERDATAGRID2.dynamicColumn = new DynamicColumnSet();   // radek Celkem
         }
 
+        /// <summary>
+        /// pri startu programu (zobrazeni stranky) se rozpis predvoleneho mesice hned nacte - bez nabidky generovani
+        /// </summary>
+        bool prvniNacteni = true;
+
         public override void JisRefresh_Page()
         {
-            if (Goa.IsInit( Name ) && pageBase.Status == EStatus.fill)
+            if (Goa.IsInit( Name ) && pageBase.Status != EStatus.view)
                 JisReloaded_Page();
             else if (pageBase.Status == EStatus.view)
                 USERDATAGRID1.SetRowCol();
@@ -102,6 +107,11 @@ namespace SPSSMENYRA
         /// </summary>
         void NabidnoutGenerovani()
         {
+            if (prvniNacteni)
+            {
+                prvniNacteni = false;     // prazdny mesic pri startu jen zobrazit, generovani se nabidne pri vyberu mesice / OBNOVIT
+                return;
+            }
             string mesic = $"{pageBase.Mesic:00}/{pageBase.Rok}";
             if (pageBase.NabidnutyMesic == mesic)
                 return;
@@ -311,8 +321,8 @@ namespace SPSSMENYRA
                         CAST(IFNULL(m.smen, 0) AS DECIMAL(4,0)) AS fsmen,
                         CAST(IFNULL(r.hod, 0) AS DECIMAL(7,1)) AS fhodc
                     FROM {Smena.T3} t3
-                    LEFT JOIN (SELECT x.ft301, SUM(x.hod) AS hod, SUM(x.smen) AS smen FROM ({Hodiny( "@mesod", "@mesdo" )}) x GROUP BY x.ft301) m ON m.ft301 = t3.ft301
-                    LEFT JOIN (SELECT x.ft301, SUM(x.hod) AS hod FROM ({Hodiny( "@rokod", "@rokdo" )}) x GROUP BY x.ft301) r ON r.ft301 = t3.ft301
+                    LEFT JOIN (SELECT x.ft301, SUM(x.hod) AS hod, SUM(x.smen) AS smen FROM ({RozpisSluzba.HodinySql( "@mesod", "@mesdo" )}) x GROUP BY x.ft301) m ON m.ft301 = t3.ft301
+                    LEFT JOIN (SELECT x.ft301, SUM(x.hod) AS hod FROM ({RozpisSluzba.HodinySql( "@rokod", "@rokdo" )}) x GROUP BY x.ft301) r ON r.ft301 = t3.ft301
                     WHERE t3.f0 = ''
                     ORDER BY t3.ft302";
 
@@ -351,15 +361,6 @@ namespace SPSSMENYRA
                 dt.ColumnChanged += Pracovnici_ColumnChanged;
                 return true;
             }
-
-            /// <summary>
-            /// hodiny a smeny pracovniku ze vsech 4 sloupcu radku dne v obdobi (rucne opravene maji prednost)
-            /// </summary>
-            static string Hodiny(string od, string @do)
-                => string.Join( " UNION ALL ", Enumerable.Range( 1, RozpisSluzba.Sloupcu ).Select( n => $@"
-                    SELECT d0.f00{n}1 AS ft301, IF(d0.f00{n}3 <> 0, d0.f00{n}3, d0.f00{n}2) AS hod, 1 AS smen
-                    FROM {Smena.D0} d0
-                    WHERE d0.f003 = '2' AND d0.f004 = 'R' AND d0.f00{n}1 <> '' AND d0.f002 BETWEEN {od} AND {@do}" ) );
 
             /// <summary>
             /// hodiny pracovniku za den vybrany v rozpisu (VFP SPORT0_2TMT3_SUM_DAY) - casovy radek = bez hodin, filtr se neuplatni
