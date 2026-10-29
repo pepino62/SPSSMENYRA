@@ -1,0 +1,62 @@
+﻿[
+    {
+        "Name":  "useConnectionFile",
+        "Value":  true,
+        "Code":  "",
+        "Typ":  "Boolean"
+    },
+    {
+        "Name":  "ConnectionFile",
+        "Value":  "C:\\JisApp\\Connection\\Connection.json",
+        "Code":  "",
+        "Typ":  "String"
+    },
+    {
+        "Name":  "useLogin",
+        "Value":  true,
+        "Code":  "",
+        "Typ":  "Boolean"
+    },
+    {
+        "Name":  "Login",
+        "Value":  1,
+        "Code":  "",
+        "Typ":  "Int64"
+    },
+    {
+        "Name":  "useSingleInstance",
+        "Value":  true,
+        "Code":  "",
+        "Typ":  "Boolean"
+    },
+    {
+        "Name":  "SingleInstance",
+        "Value":  0,
+        "Code":  "",
+        "Typ":  "Int64"
+    },
+    {
+        "Name":  "useStartIdConnection",
+        "Value":  true,
+        "Code":  "",
+        "Typ":  "Boolean"
+    },
+    {
+        "Name":  "StartIdConnection",
+        "Value":  "SportisLocal",
+        "Code":  "",
+        "Typ":  "String"
+    },
+    {
+        "Name":  "useJisApp",
+        "Value":  true,
+        "Code":  "",
+        "Typ":  "Boolean"
+    },
+    {
+        "Name":  "UseJisApp",
+        "Value":  0,
+        "Code":  "",
+        "Typ":  "Int64"
+    }
+]
