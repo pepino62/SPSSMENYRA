@@ -148,6 +148,29 @@ namespace SPSSMENYRA
             Refresh();
         }
 
+        // tisk rozpisu mesice (VFP RES02) a celeho roku (VFP XRES01)
+        private void BtnTisk_Click(object sender, RoutedEventArgs e) => Tisk( () => SmenyTisk.Rozpis( pageBase.Rok, pageBase.Mesic ) );
+
+        private void BtnTiskRoku_Click(object sender, RoutedEventArgs e) => Tisk( () => SmenyTisk.RozpisRok( pageBase.Rok ) );
+
+        static void Tisk(Action tisk)
+        {
+            try
+            {
+                using (new WaitCursor())
+                    tisk();
+            }
+            catch (JisException e1)
+            {
+                if (!string.IsNullOrEmpty( e1.Text ))
+                    Msg.Ok( e1.Text );
+            }
+            catch (Exception ex)
+            {
+                Msg.Err( ex );
+            }
+        }
+
 
         private class RozpisBind : DataBindBasic
         {
@@ -220,38 +243,12 @@ namespace SPSSMENYRA
             }
 
             /// <summary>
-            /// rozpis mesice (VFP SPORT0_2TMP_C)
-            /// <br>FX1..4 - casovy radek: rozmezi z t2, radek dne: jmeno z t3; FK1..4 - kod (f00n1)</br>
-            /// <br>FH1..4 - hodiny: casovy radek f00n2, radek dne f00n3 (rucne), jinak f00n2; FR1..4 = 1 rucne opravene hodiny</br>
+            /// rozpis mesice (VFP SPORT0_2TMP_C) - sloupce viz RozpisSluzba.RozpisSql
             /// </summary>
             bool Rozpis()
             {
                 DateTime od = new DateTime( Rok, Mesic, 1 );
-                string sloupce = "";
-                string join = "";
-                for (int n = 1; n <= RozpisSluzba.Sloupcu; n++)
-                {
-                    sloupce += $@",
-                        d0.f00{n}1 AS fk{n},
-                        IF(d0.f003 = '1', IFNULL(t2_{n}.ft202, ''), IFNULL(t3_{n}.ft302, '')) AS fx{n},
-                        IF(d0.f00{n}1 = '', NULL, IF(d0.f003 = '2' AND d0.f00{n}3 <> 0, d0.f00{n}3, NULLIF(d0.f00{n}2, 0))) AS fh{n},
-                        IF(d0.f003 = '2' AND d0.f00{n}1 <> '' AND d0.f00{n}3 <> 0, 1, 0) AS fr{n},
-                        IF(d0.f00{n}1 = '', NULL, IF(d0.f003 = '2' AND d0.f00{n}3 <> 0, d0.f00{n}3, NULLIF(d0.f00{n}2, 0))) AS fs{n}";
-                    join += $@"
-                        LEFT JOIN {Smena.T2} t2_{n} ON t2_{n}.ft201 = d0.f00{n}1 AND d0.f003 = '1'
-                        LEFT JOIN {Smena.T3} t3_{n} ON t3_{n}.ft301 = d0.f00{n}1 AND d0.f003 = '2'";
-                }
-
-                string cmd = $@"
-                    SELECT d0.f001, d0.f002, d0.f003, d0.f005,
-                        IF(d0.f003 = '2' AND d0.f005 = '00', DAY(d0.f002), NULL) AS fday,
-                        IF(d0.f003 = '2', ELT(DAYOFWEEK(d0.f002), 'Ne', 'Po', 'Út', 'St', 'Čt', 'Pá', 'So'), '') AS fdayc,
-                        DAYOFWEEK(d0.f002) AS fdayn{sloupce}
-                    FROM {Smena.D0} d0{join}
-                    WHERE d0.f004 = 'R' AND d0.f002 BETWEEN @datod AND @datdo
-                    ORDER BY d0.f002, d0.f003, d0.f005";
-
-                if (!SpravaDat.Select( "rozpis", cmd, new { datod = od, datdo = od.AddMonths( 1 ).AddDays( -1 ) } ))
+                if (!SpravaDat.Select( "rozpis", RozpisSluzba.RozpisSql(), new { datod = od, datdo = od.AddMonths( 1 ).AddDays( -1 ) } ))
                     return false;
                 Filtrovat();
                 return true;

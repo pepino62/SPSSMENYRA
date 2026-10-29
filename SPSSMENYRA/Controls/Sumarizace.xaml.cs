@@ -90,6 +90,27 @@ namespace SPSSMENYRA
             Refresh();
         }
 
+        // tisk prehledu sluzeb za rok (VFP RES01) - z nactenych dat zalozky
+        private void BtnTisk_Click(object sender, RoutedEventArgs e)
+        {
+            try
+            {
+                if (pageBase.Status != EStatus.view || Goa.Table( "sumarizace" ) == null)
+                    throw new JisException( "Nejdříve načtěte sumarizaci (OBNOVIT)" );
+                using (new WaitCursor())
+                    SmenyTisk.Prehled( pageBase.Rok, Goa.Table( "sumarizace" ) );
+            }
+            catch (JisException e1)
+            {
+                if (!string.IsNullOrEmpty( e1.Text ))
+                    Msg.Ok( e1.Text );
+            }
+            catch (Exception ex)
+            {
+                Msg.Err( ex );
+            }
+        }
+
 
         private class SumarizaceBind : DataBindBasic
         {

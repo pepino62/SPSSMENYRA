@@ -41,6 +41,10 @@
 
                 <jr:JisButton Content=" OBNOVIT " Style="{StaticResource BUTT_DARK}" Background="SteelBlue" Click="BtnObnovit_Click"
                               ToolTip="znovu načte rozpis vybraného měsíce" VerticalAlignment="Center" Margin="10,0,0,0" />
+                <jr:JisButton Content=" TISK " Style="{StaticResource BUTT_DARK}" Background="#8B4AA8" Click="BtnTisk_Click"
+                              ToolTip="tisk rozpisu služeb vybraného měsíce se součty pracovníků (PDF z náhledu)" VerticalAlignment="Center" Margin="20,0,0,0" />
+                <jr:JisButton Content=" TISK ROKU " Style="{StaticResource BUTT_DARK}" Background="#8B4AA8" Click="BtnTiskRoku_Click"
+                              ToolTip="tisk rozpisu služeb všech měsíců roku (PDF z náhledu)" VerticalAlignment="Center" Margin="10,0,0,0" />
 
                 <!-- filtr podle oznacenych pracovniku v pravem gridu -->
                 <TextBlock Text="{Binding FiltrText}" Margin="15,0,5,0" VerticalAlignment="Center" FontWeight="Bold" Foreground="#B00060"

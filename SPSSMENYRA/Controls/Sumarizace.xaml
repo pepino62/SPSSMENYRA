@@ -26,6 +26,8 @@
 
                 <jr:JisButton Content=" OBNOVIT " Style="{StaticResource BUTT_DARK}" Background="SteelBlue" Click="BtnObnovit_Click"
                               ToolTip="znovu načte sumarizaci vybraného roku" VerticalAlignment="Center" Margin="10,0,0,0" />
+                <jr:JisButton Content=" TISK " Style="{StaticResource BUTT_DARK}" Background="#8B4AA8" Click="BtnTisk_Click"
+                              ToolTip="tisk přehledu služeb za rok (PDF z náhledu)" VerticalAlignment="Center" Margin="20,0,0,0" />
             </StackPanel>
         </Border>
 

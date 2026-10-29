@@ -56,6 +56,38 @@ namespace SPSSMENYRA
         }
 
         /// <summary>
+        /// SQL rozpisu za obdobi @datod - @datdo v poradi radku (VFP SPORT0_2TMP_C)
+        /// <br>FX1..4 - casovy radek: rozmezi z t2, radek dne: jmeno z t3; FK1..4 - kod (f00n1)</br>
+        /// <br>FH1..4 - hodiny: casovy radek f00n2, radek dne f00n3 (rucne), jinak f00n2; FR1..4 = 1 rucne opravene hodiny; FS1..4 = FH (pro soucty i pri filtru)</br>
+        /// </summary>
+        public static string RozpisSql()
+        {
+            string sloupce = "";
+            string join = "";
+            for (int n = 1; n <= Sloupcu; n++)
+            {
+                sloupce += $@",
+                    d0.f00{n}1 AS fk{n},
+                    IF(d0.f003 = '1', IFNULL(t2_{n}.ft202, ''), IFNULL(t3_{n}.ft302, '')) AS fx{n},
+                    IF(d0.f00{n}1 = '', NULL, IF(d0.f003 = '2' AND d0.f00{n}3 <> 0, d0.f00{n}3, NULLIF(d0.f00{n}2, 0))) AS fh{n},
+                    IF(d0.f003 = '2' AND d0.f00{n}1 <> '' AND d0.f00{n}3 <> 0, 1, 0) AS fr{n},
+                    IF(d0.f00{n}1 = '', NULL, IF(d0.f003 = '2' AND d0.f00{n}3 <> 0, d0.f00{n}3, NULLIF(d0.f00{n}2, 0))) AS fs{n}";
+                join += $@"
+                    LEFT JOIN {Smena.T2} t2_{n} ON t2_{n}.ft201 = d0.f00{n}1 AND d0.f003 = '1'
+                    LEFT JOIN {Smena.T3} t3_{n} ON t3_{n}.ft301 = d0.f00{n}1 AND d0.f003 = '2'";
+            }
+
+            return $@"
+                SELECT d0.f001, d0.f002, d0.f003, d0.f005,
+                    IF(d0.f003 = '2' AND d0.f005 = '00', DAY(d0.f002), NULL) AS fday,
+                    IF(d0.f003 = '2', ELT(DAYOFWEEK(d0.f002), 'Ne', 'Po', 'Út', 'St', 'Čt', 'Pá', 'So'), '') AS fdayc,
+                    DAYOFWEEK(d0.f002) AS fdayn{sloupce}
+                FROM {Smena.D0} d0{join}
+                WHERE d0.f004 = 'R' AND d0.f002 BETWEEN @datod AND @datdo
+                ORDER BY d0.f002, d0.f003, d0.f005";
+        }
+
+        /// <summary>
         /// SQL hodin a smen pracovniku ze vsech 4 sloupcu radku dne v obdobi (rucne opravene maji prednost)
         /// <br>sloupce ft301, f002, hod, smen (1 za kazdy obsazeny sloupec); od / do = nazvy parametru, napr. "@datod"</br>
         /// </summary>
