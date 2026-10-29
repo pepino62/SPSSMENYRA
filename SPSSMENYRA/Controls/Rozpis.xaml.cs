@@ -407,6 +407,8 @@ namespace SPSSMENYRA
             /// </summary>
             public override int ExecuteCommand(object _object, ModifierKeys modifierKeys, DataBindBasic _baseCodeBind)
             {
+                if (_object == Stranka?.USERDATAGRID2)
+                    return KartaPracovnika();
                 if (_object != Stranka?.USERDATAGRID1)
                     return base.ExecuteCommand( _object, modifierKeys, _baseCodeBind );
 
@@ -431,6 +433,31 @@ namespace SPSSMENYRA
                         $"{row[ $"fx{n}" ]}".Trim() + $",  {(DateTime)row[ "f002" ]:d.M.yyyy}", hod );
                     if (nove != null)
                         Proved( () => RozpisSluzba.NastavitHodiny( f001, n, nove.Value ) );
+                }
+                return 1;
+            }
+
+            /// <summary>
+            /// dvojklik na pracovnika v pravem gridu - karta pracovnika s dovolenou na rok rozpisu
+            /// </summary>
+            int KartaPracovnika()
+            {
+                DataRow row = Stranka.USERDATAGRID2.GetRow();
+                if (row == null || $"{row[ "ftyp" ]}" != "1")
+                    return 1;
+                try
+                {
+                    if (new KartaPracovnika( $"{row[ "ft301" ]}".Trim(), Rok ).ShowDialog( Window.GetWindow( Stranka ) ))
+                        Stranka.Refresh();
+                }
+                catch (JisException e1)
+                {
+                    if (!string.IsNullOrEmpty( e1.Text ))
+                        Msg.Ok( e1.Text );
+                }
+                catch (Exception ex)
+                {
+                    Msg.Err( ex );
                 }
                 return 1;
             }

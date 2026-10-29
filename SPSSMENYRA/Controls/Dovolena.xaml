@@ -1,0 +1,60 @@
+<jr:JisWindow
+    x:Class="SPSSMENYRA.Dovolena"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:jr="clr-namespace:JisResources;assembly=JisResources"
+    Title="Dovolená">
+
+    <!-- VFP SPORT11 - cerpani dovolene -->
+    <StackPanel Margin="10">
+        <Border Padding="10" CornerRadius="2" BorderBrush="#979AAA" BorderThickness="1" Background="#FFE4CC">
+            <StackPanel>
+                <TextBlock x:Name="txtJmeno" FontSize="16" FontWeight="Bold" Margin="0,0,0,8" />
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="Auto" />
+                        <ColumnDefinition Width="Auto" />
+                    </Grid.ColumnDefinitions>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="Auto" />
+                    </Grid.RowDefinitions>
+                    <Label x:Name="lblPlan" Grid.Row="0" Style="{StaticResource LBL_VERT}" />
+                    <TextBlock x:Name="txtPlan" Grid.Row="0" Grid.Column="1" VerticalAlignment="Center" FontWeight="Bold" Foreground="#FF0080" />
+                    <Label Grid.Row="1" Content="vyčerpáno dnů dovolené :" Style="{StaticResource LBL_VERT}" />
+                    <TextBlock x:Name="txtCerpano" Grid.Row="1" Grid.Column="1" VerticalAlignment="Center" FontWeight="Bold" Foreground="Blue" />
+                </Grid>
+
+                <TextBlock Text="Zadat čerpání dovolené" FontWeight="Bold" Margin="0,10,0,4" />
+                <StackPanel Orientation="Horizontal">
+                    <Label Content="od :" Style="{StaticResource LBL_VERT}" />
+                    <DatePicker x:Name="dtpOd" Width="120" Margin="2" Style="{StaticResource DTP}" SelectedDateChanged="Rozsah_Changed" />
+                    <Label Content="do :" Style="{StaticResource LBL_VERT}" Margin="8,0,0,0" />
+                    <DatePicker x:Name="dtpDo" Width="120" Margin="2" Style="{StaticResource DTP}" SelectedDateChanged="Rozsah_Changed" />
+                    <Label Content="to je dnů :" Style="{StaticResource LBL_VERT}" Margin="8,0,0,0" />
+                    <TextBlock x:Name="txtDnu" VerticalAlignment="Center" FontWeight="Bold" MinWidth="25" />
+                    <jr:JisButton Content=" ULOŽIT " Style="{StaticResource BUTT_DARK}" Background="#E0107F" Click="BtnUlozit_Click" Margin="10,0,0,0" />
+                </StackPanel>
+            </StackPanel>
+        </Border>
+
+        <DataGrid x:Name="dgCerpani" Margin="0,10,0,0" Height="300"
+                  AutoGenerateColumns="False" IsReadOnly="True" SelectionMode="Extended" SelectionUnit="FullRow"
+                  CanUserAddRows="False" CanUserDeleteRows="False" RowHeight="20"
+                  Style="{DynamicResource JISDATAGRID}">
+            <DataGrid.Columns>
+                <DataGridTextColumn Header="datum" Binding="{Binding [f104], StringFormat=dd.MM.yyyy}" Width="90" />
+                <DataGridTextColumn Header="den" Binding="{Binding [fdayc]}" Width="40" />
+                <DataGridTextColumn Header="dnů" Binding="{Binding [f103], StringFormat=0.0}" Width="45" />
+            </DataGrid.Columns>
+        </DataGrid>
+
+        <StackPanel Orientation="Horizontal" Margin="0,8,0,0">
+            <jr:JisButton Content=" ½ DNE / CELÝ DEN " Style="{StaticResource BUTT_DARK}" Background="SteelBlue" Click="BtnPulDne_Click"
+                          ToolTip="u vybraných dnů přepne čerpání půl dne / celý den" />
+            <jr:JisButton Content=" SMAZAT " Style="{StaticResource BUTT_DARK}" Background="#D04040" Click="BtnSmazat_Click" Margin="10,0,0,0"
+                          ToolTip="smaže vybrané dny dovolené (výběr více dnů: Ctrl / Shift + klik)" />
+            <jr:JisButton Content=" ZAVŘÍT " Style="{StaticResource BUTT_DARK}" Background="SteelBlue" Click="BtnZavrit_Click" Margin="30,0,0,0" IsCancel="True" />
+        </StackPanel>
+    </StackPanel>
+</jr:JisWindow>

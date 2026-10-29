@@ -107,6 +107,7 @@ namespace SPSSMENYRA
 
             AddPage( new Rozpis(), "  ROZPIS  " );
             AddPage( new Sumarizace(), "  SUMARIZACE  " );
+            AddPage( new Pracovnici(), "  PRACOVNÍCI  " );
         }
     }
 

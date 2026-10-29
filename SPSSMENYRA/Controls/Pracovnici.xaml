@@ -1,0 +1,42 @@
+<jr:JisUserControl x:Class="SPSSMENYRA.Pracovnici"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:local="clr-namespace:SPSSMENYRA"
+             mc:Ignorable="d"
+             xmlns:jr="clr-namespace:JisResources;assembly=JisResources">
+    <Grid Margin="10">
+        <Grid.RowDefinitions >
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
+
+        <Border Grid.Row="0" Margin="0,0,0,10" CornerRadius="2" BorderBrush="#979AAA" BorderThickness="1" Background="#94D880" HorizontalAlignment="Left" >
+            <StackPanel Orientation="Horizontal" Margin="5" >
+                <Label Content="dovolená na rok :" Style="{DynamicResource LBL_CENTER}" />
+                <ComboBox x:Name="cboRok"
+                          MinWidth="70"
+                          Margin="2,0,15,0"
+                          ItemsSource="{Binding Roky}"
+                          SelectedValue="{Binding Rok}"
+                          SelectionChanged="CboRok_SelectionChanged"
+                          Style="{DynamicResource JisComboBox}" />
+
+                <jr:JisButton Content=" NOVÝ PRACOVNÍK " Style="{StaticResource BUTT_DARK}" Background="MediumSeaGreen" Click="BtnNovy_Click"
+                              ToolTip="založit nového pracovníka" VerticalAlignment="Center" Margin="10,0,0,0" />
+                <jr:JisButton Content=" OPRAVA " Style="{StaticResource BUTT_DARK}" Background="#E0107F" Click="BtnOprava_Click"
+                              ToolTip="karta vybraného pracovníka (také dvojklik v seznamu)" VerticalAlignment="Center" Margin="10,0,0,0" />
+                <jr:JisButton Content=" DOVOLENÁ " Style="{StaticResource BUTT_DARK}" Background="SteelBlue" Click="BtnDovolena_Click"
+                              ToolTip="čerpání dovolené vybraného pracovníka" VerticalAlignment="Center" Margin="10,0,0,0" />
+                <jr:JisButton Content=" OBNOVIT " Style="{StaticResource BUTT_DARK}" Background="SteelBlue" Click="BtnObnovit_Click"
+                              VerticalAlignment="Center" Margin="10,0,0,0" />
+            </StackPanel>
+        </Border>
+
+        <!-- seznam pracovniku (VFP SPORT21_GRD001) -->
+        <jr:JisDataGrid x:Name="USERDATAGRID1" Grid.Row="1" HorizontalAlignment="Left"
+                        jisWgridSkey="SMENY_PRAC_SEZNAM"
+                        jisSourceName="pracseznam"/>
+    </Grid>
+</jr:JisUserControl>
