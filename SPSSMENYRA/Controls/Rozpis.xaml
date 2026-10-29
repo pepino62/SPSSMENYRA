@@ -11,9 +11,13 @@
             <RowDefinition Height="Auto"/>
             <RowDefinition Height="*"/>
         </Grid.RowDefinitions>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="Auto"/>
+            <ColumnDefinition Width="*"/>
+        </Grid.ColumnDefinitions>
 
         <!-- vyber roku a mesice (VFP SPORT0_CNT004) -->
-        <Border Grid.Row="0" Margin="0,0,0,10" CornerRadius="2" BorderBrush="#979AAA" BorderThickness="1" Background="#94D880" HorizontalAlignment="Left" >
+        <Border Grid.Row="0" Grid.ColumnSpan="2" Margin="0,0,0,10" CornerRadius="2" BorderBrush="#979AAA" BorderThickness="1" Background="#94D880" HorizontalAlignment="Left" >
             <StackPanel Orientation="Horizontal" Margin="5" >
                 <Label Content="Na rok :" Style="{DynamicResource LBL_CENTER}" />
                 <ComboBox x:Name="cboRok"
@@ -40,9 +44,15 @@
             </StackPanel>
         </Border>
 
-        <jr:JisDataGrid x:Name="USERDATAGRID1" Grid.Row="1" HorizontalAlignment="Left"
+        <!-- rozpis (VFP SPORT0_GRD001) - dvojklik: vyber casu / pracovnika / hodin, prave tlacitko: radky -->
+        <jr:JisDataGrid x:Name="USERDATAGRID1" Grid.Row="1" Grid.Column="0" HorizontalAlignment="Left"
                         jisWgridSkey="SMENY_ROZPIS"
                         jisSourceName="rozpis"/>
+
+        <!-- soucty pracovniku (VFP SPORT0_GRD002) -->
+        <jr:JisDataGrid x:Name="USERDATAGRID2" Grid.Row="1" Grid.Column="1" Margin="10,0,0,0" HorizontalAlignment="Left"
+                        jisWgridSkey="SMENY_PRACOVNICI"
+                        jisSourceName="pracovnici"/>
 
     </Grid>
 </jr:JisUserControl>

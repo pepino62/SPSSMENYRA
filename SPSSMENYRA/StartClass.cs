@@ -160,6 +160,12 @@ namespace SPSSMENYRA
                         return FontWeights.Bold;
                     break;
 
+                // soucty pracovniku - radek Celkem zeleny (VFP SPORT0_GRD002)
+                case "CB_SMENY_PRAC":
+                    if ((string)dataRow[ "FTYP" ] == "2")
+                        return "#00F080";
+                    return "#CCE4FF";
+
                 default:
                     return null;
             }

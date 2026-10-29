@@ -1,0 +1,20 @@
+<jr:JisWindow
+    x:Class="SPSSMENYRA.HodinyDialog"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:jr="clr-namespace:JisResources;assembly=JisResources"
+    Title="Hodiny">
+
+    <StackPanel Margin="15,10,15,10">
+        <TextBlock x:Name="txtPopis" Margin="0,0,0,8" FontSize="12" />
+        <StackPanel Orientation="Horizontal">
+            <Label Content="hodin :" Style="{DynamicResource LBL_CENTER}" />
+            <TextBox x:Name="txtHodiny" Width="60" FontSize="13" TextAlignment="Right" VerticalContentAlignment="Center" />
+        </StackPanel>
+        <TextBlock Margin="0,6,0,0" FontSize="10" Foreground="Gray" Text="0 = zrušit ruční opravu (platí hodiny z časového rozvrhu)" />
+        <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Margin="0,12,0,0">
+            <jr:JisButton Content=" ULOŽIT " Style="{StaticResource BUTT_DARK}" Background="MediumSeaGreen" Click="BtnUlozit_Click" IsDefault="True" Margin="0,0,10,0" />
+            <jr:JisButton Content=" ZPĚT " Style="{StaticResource BUTT_DARK}" Background="SteelBlue" Click="BtnZpet_Click" IsCancel="True" />
+        </StackPanel>
+    </StackPanel>
+</jr:JisWindow>
