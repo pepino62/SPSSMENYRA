@@ -48,7 +48,7 @@
                 <DatePicker Grid.Row="3" Grid.Column="1" Width="120" HorizontalAlignment="Left" Margin="2"
                             SelectedDate="{Binding Pracovnik.Ft305}" SelectedDateChanged="Narozeni_Changed" Style="{StaticResource DTP}" />
                 <Label Grid.Row="3" Grid.Column="2" Content="věk :" Style="{StaticResource LBL_VERT}" Margin="15,0,0,0" />
-                <TextBlock x:Name="txtVek" Grid.Row="3" Grid.Column="3" VerticalAlignment="Center" Margin="4,0,0,0" FontWeight="Bold" />
+                <TextBlock x:Name="txtVek" Grid.Row="3" Grid.Column="3" VerticalAlignment="Center" Margin="4,0,0,0" FontWeight="Bold" Foreground="Black"/>
 
                 <Label Grid.Row="4" Grid.Column="0" Content="telefon :" Style="{StaticResource LBL_VERT}" />
                 <jr:JisTextBox Grid.Row="4" Grid.Column="1" Width="110" HorizontalAlignment="Left"
@@ -76,7 +76,7 @@
                     <jr:JisTextBox Grid.Row="0" Grid.Column="1" Width="50" MaxLength="5"
                                    Text="{Binding Pracovnik.Dovp, StringFormat=0.0}" Style="{StaticResource GET_RIGHT}" />
                     <Label Grid.Row="1" Grid.Column="0" Content="vyčerpáno :" Style="{StaticResource LBL_VERT}" />
-                    <TextBlock x:Name="txtDovv" Grid.Row="1" Grid.Column="1" VerticalAlignment="Center" HorizontalAlignment="Right" Margin="0,0,4,0" FontWeight="Bold" />
+                    <TextBlock x:Name="txtDovv" Grid.Row="1" Grid.Column="1" VerticalAlignment="Center" HorizontalAlignment="Right" Margin="0,0,4,0" FontWeight="Bold" Foreground="Black"/>
                     <jr:JisButton x:Name="btnDovolena" Grid.Row="0" Grid.RowSpan="2" Grid.Column="2" Margin="20,0,0,0" HorizontalAlignment="Right"
                                   Content=" DOVOLENÁ " Style="{StaticResource BUTT_DARK}" Background="SteelBlue" Click="BtnDovolena_Click"
                                   ToolTip="přehled a zadání čerpání dovolené" />
